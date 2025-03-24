@@ -1,7 +1,7 @@
 # Context
 
 
-I am building the backend of a Farmer's Portal using Core PHP and MySQL with a timeline of 3 weeks. The project consists of two major sections:
+I am building the backend of a Farmer's Portal using Core PHP and MySQL. The project consists of two major sections:
 Project Overview:
 1. E-Commerce Module:
    * Farmers can list products (name, quantity, price, images, etc.).
