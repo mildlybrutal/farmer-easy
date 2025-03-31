@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer's Portal - Login</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#4ade80',
+                            DEFAULT: '#16a34a',
+                            dark: '#15803d',
+                        },
+                        secondary: {
+                            light: '#fde68a',
+                            DEFAULT: '#f59e0b',
+                            dark: '#d97706',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen">
+    <!-- Header -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="text-2xl font-bold text-green-600">FarmConnect</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl mt-20">
+            <div class="md:flex">
+                <div class="md:shrink-0 hidden md:block">
+                    <img class="h-full w-48 object-cover" src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Farm landscape">
+                </div>
+                <div class="p-8 w-full">
+                    <div class="text-center mb-6">
+                        <h1 class="text-2xl font-bold text-primary">Farmer's Portal</h1>
+                        <p class="text-gray-500 text-sm">Connecting farmers, retailers, and consumers</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="flex justify-center space-x-4 mb-6">
+                            <button id="loginBtn" class="px-4 py-2 font-medium border-b-2 border-primary text-primary">Login</button>
+                            <button id="registerBtn" class="px-4 py-2 font-medium text-gray-500 hover:text-primary">Register</button>
+                        </div>
+                        
+                        <form id="loginForm">
+                            <div class="mb-4">
+                                <label for="email" class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                                <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                            </div>
+                            <div class="mb-6">
+                                <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Password</label>
+                                <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                                <a href="#" class="text-xs text-primary mt-1 inline-block hover:underline">Forgot password?</a>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Login as:</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="border rounded-md p-3 text-center cursor-pointer hover:border-primary hover:bg-green-50 transition-colors user-type" data-type="farmer">
+                                        <span class="block text-sm font-medium">Farmer</span>
+                                    </div>
+                                    <div class="border rounded-md p-3 text-center cursor-pointer hover:border-primary hover:bg-green-50 transition-colors user-type" data-type="retailer">
+                                        <span class="block text-sm font-medium">Retailer</span>
+                                    </div>
+                                    <div class="border rounded-md p-3 text-center cursor-pointer hover:border-primary hover:bg-green-50 transition-colors user-type" data-type="consumer">
+                                        <span class="block text-sm font-medium">Consumer</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-md transition-colors">
+                                Login
+                            </button>
+                        </form>
+                        
+                        <form id="registerForm" class="hidden">
+                            <div class="mb-4">
+                                <label for="fullName" class="block text-gray-700 text-sm font-medium mb-2">Full Name</label>
+                                <input type="text" id="fullName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="registerEmail" class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                                <input type="email" id="registerEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="registerPassword" class="block text-gray-700 text-sm font-medium mb-2">Password</label>
+                                <input type="password" id="registerPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="confirmPassword" class="block text-gray-700 text-sm font-medium mb-2">Confirm Password</label>
+                                <input type="password" id="confirmPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Register as:</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="border rounded-md p-3 text-center cursor-pointer hover:border-primary hover:bg-green-50 transition-colors user-type" data-type="farmer">
+                                        <span class="block text-sm font-medium">Farmer</span>
+                                    </div>
+                                    <div class="border rounded-md p-3 text-center cursor-pointer hover:border-primary hover:bg-green-50 transition-colors user-type" data-type="retailer">
+                                        <span class="block text-sm font-medium">Retailer</span>
+                                    </div>
+                                    <div class="border rounded-md p-3 text-center cursor-pointer hover:border-primary hover:bg-green-50 transition-colors user-type" data-type="consumer">
+                                        <span class="block text-sm font-medium">Consumer</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-md transition-colors">
+                                Register
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white rounded-xl shadow-sm p-6 mt-10">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 mb-4">FarmConnect</h3>
+                <p class="text-gray-600 text-sm">Connecting farmers directly with consumers and retailers for a more sustainable food system.</p>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="selling.html" class="text-gray-600 hover:text-primary text-sm">Marketplace</a></li>
+                    <li><a href="bidding.html" class="text-gray-600 hover:text-primary text-sm">Bidding Platform</a></li>
+                    <li><a href="#" class="text-gray-600 hover:text-primary text-sm">My Products</a></li>
+                    <li><a href="#" class="text-gray-600 hover:text-primary text-sm">About Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Support</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-600 hover:text-primary text-sm">Help Center</a></li>
+                    <li><a href="#" class="text-gray-600 hover:text-primary text-sm">Contact Us</a></li>
+                    <li><a href="#" class="text-gray-600 hover:text-primary text-sm">Terms of Service</a></li>
+                    <li><a href="#" class="text-gray-600 hover:text-primary text-sm">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Connect With Us</h3>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-primary">
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary">
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary">
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="mt-8 pt-8 border-t border-gray-200">
+            <p class="text-center text-gray-500 text-sm">&copy; 2024 FarmConnect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            // Toggle between login and register forms
+            loginBtn.addEventListener('click', function() {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                loginBtn.classList.add('border-b-2', 'border-primary', 'text-primary');
+                registerBtn.classList.remove('border-b-2', 'border-primary', 'text-primary');
+                registerBtn.classList.add('text-gray-500');
+            });
+            
+            registerBtn.addEventListener('click', function() {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                registerBtn.classList.add('border-b-2', 'border-primary', 'text-primary');
+                loginBtn.classList.remove('border-b-2', 'border-primary', 'text-primary');
+                loginBtn.classList.add('text-gray-500');
+            });
+            
+            // Handle user type selection
+            const userTypes = document.querySelectorAll('.user-type');
+            userTypes.forEach(type => {
+                type.addEventListener('click', function() {
+                    const parent = this.parentElement;
+                    parent.querySelectorAll('.user-type').forEach(el => {
+                        el.classList.remove('border-primary', 'bg-green-50');
+                    });
+                    this.classList.add('border-primary', 'bg-green-50');
+                });
+            });
+            
+            // Form submissions
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Simulate login - redirect to e-commerce page
+                window.location.href = 'selling.html';
+            });
+            
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Show success message or redirect
+                alert('Registration successful! Please login.');
+                loginBtn.click();
+            });
+        });
+    </script>
+</body>
+</html>
