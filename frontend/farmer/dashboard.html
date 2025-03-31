@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Dashboard - FarmConnect</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen">
+    <nav class="bg-white shadow-md">
+        <!-- Similar navigation as index.html -->
+    </nav>
+    
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Products Section -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold mb-4">My Products</h2>
+                <div id="productsList"></div>
+                <button onclick="showAddProductModal()" class="mt-4 bg-primary text-white px-4 py-2 rounded">
+                    Add New Product
+                </button>
+            </div>
+            
+            <!-- Bids Section -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold mb-4">My Bids</h2>
+                <div id="bidsList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../js/api.js"></script>
+    <script src="../js/farmer.js"></script>
+</body>
+</html> 

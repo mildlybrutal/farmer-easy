@@ -214,17 +214,36 @@
             });
             
             // Form submissions
-            loginForm.addEventListener('submit', function(e) {
+            loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                // Simulate login - redirect to e-commerce page
-                window.location.href = 'selling.html';
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const roleElement = loginForm.querySelector('.user-type.border-primary');
+                const role = roleElement ? roleElement.dataset.type : null;
+                
+                if (!role) {
+                    showError('Please select a user type');
+                    return;
+                }
+                
+                await handleLogin(email, password, role);
             });
             
-            registerForm.addEventListener('submit', function(e) {
+            registerForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                // Show success message or redirect
-                alert('Registration successful! Please login.');
-                loginBtn.click();
+                const userData = {
+                    name: document.getElementById('fullName').value,
+                    email: document.getElementById('registerEmail').value,
+                    password: document.getElementById('registerPassword').value,
+                    role: registerForm.querySelector('.user-type.border-primary')?.dataset.type
+                };
+                
+                if (!userData.role) {
+                    showError('Please select a user type');
+                    return;
+                }
+                
+                await handleRegister(userData);
             });
         });
     </script>

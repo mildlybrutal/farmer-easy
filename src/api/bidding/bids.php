@@ -240,9 +240,9 @@ function createBid($data) {
     }
     
     // Validate required fields
-    if (!isset($data['project_id']) || !isset($data['price'])) {
+    if (!isset($data['project_id']) || !isset($data['amount']) || !isset($data['proposal'])) {
         http_response_code(422);
-        echo json_encode(['error' => 'Project ID and price are required']);
+        echo json_encode(['error' => 'Project ID, amount, and proposal are required']);
         return;
     }
     
@@ -268,13 +268,13 @@ function createBid($data) {
         }
         
         // Create the bid
-        $stmt = $pdo->prepare("INSERT INTO bids (project_id, farmer_id, price, terms, status, created_at) 
+        $stmt = $pdo->prepare("INSERT INTO bids (project_id, farmer_id, amount, proposal, status, created_at) 
                               VALUES (?, ?, ?, ?, 'pending', NOW())");
         $stmt->execute([
             $data['project_id'],
             $userId,
-            $data['price'],
-            isset($data['terms']) ? $data['terms'] : null
+            $data['amount'],
+            $data['proposal']
         ]);
         
         $bidId = $pdo->lastInsertId();
@@ -346,14 +346,14 @@ function updateBid($id, $data) {
             $updateFields = [];
             $params = [];
             
-            if (isset($data['price'])) {
-                $updateFields[] = "price = ?";
-                $params[] = $data['price'];
+            if (isset($data['amount'])) {
+                $updateFields[] = "amount = ?";
+                $params[] = $data['amount'];
             }
             
-            if (isset($data['terms'])) {
-                $updateFields[] = "terms = ?";
-                $params[] = $data['terms'];
+            if (isset($data['proposal'])) {
+                $updateFields[] = "proposal = ?";
+                $params[] = $data['proposal'];
             }
             
             if (empty($updateFields)) {

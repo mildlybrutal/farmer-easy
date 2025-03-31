@@ -283,4 +283,101 @@ class BiddingController {
         
         return $contract;
     }
+    
+    /**
+     * Submit a bid
+     * 
+     * @param array $data Bid data
+     * @return int|bool New bid ID or false on failure
+     */
+    public function submitBid($data) {
+        $stmt = $this->pdo->prepare("INSERT INTO bids (project_id, farmer_id, amount, proposal, status, created_at) 
+                                    VALUES (?, ?, ?, ?, 'pending', NOW())");
+        
+        $result = $stmt->execute([
+            $data['project_id'],
+            $data['farmer_id'],
+            $data['amount'],
+            $data['proposal']
+        ]);
+        
+        return $result ? $this->pdo->lastInsertId() : false;
+    }
+    
+    /**
+     * Update project status
+     * 
+     * @param int $projectId Project ID
+     * @param string $status New status
+     * @return bool Success status
+     */
+    public function updateProjectStatus($projectId, $status) {
+        $stmt = $this->pdo->prepare("UPDATE projects SET status = ? WHERE id = ?");
+        return $stmt->execute([$status, $projectId]);
+    }
+    
+    /**
+     * Accept a bid
+     * 
+     * @param int $bidId Bid ID
+     * @param int $projectId Project ID
+     * @return bool Success status
+     */
+    public function acceptBid($bidId, $projectId) {
+        try {
+            $this->pdo->beginTransaction();
+            
+            // Update bid status
+            $stmt = $this->pdo->prepare("UPDATE bids SET status = 'accepted' WHERE id = ?");
+            $stmt->execute([$bidId]);
+            
+            // Reject other bids
+            $stmt = $this->pdo->prepare("UPDATE bids SET status = 'rejected' WHERE project_id = ? AND id != ?");
+            $stmt->execute([$projectId, $bidId]);
+            
+            // Close the project
+            $stmt = $this->pdo->prepare("UPDATE projects SET status = 'closed' WHERE id = ?");
+            $stmt->execute([$projectId]);
+            
+            $this->pdo->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            return false;
+        }
+    }
+}
+
+// Add WebSocket server for real-time updates
+require_once 'vendor/autoload.php';
+use Ratchet\Server\IoServer;
+use Ratchet\Http\HttpServer;
+use Ratchet\WebSocket\WsServer;
+
+class BidWebSocket implements MessageComponentInterface {
+    protected $clients;
+    
+    public function __construct() {
+        $this->clients = new \SplObjectStorage;
+    }
+    
+    public function onOpen(ConnectionInterface $conn) {
+        $this->clients->attach($conn);
+    }
+    
+    public function onMessage(ConnectionInterface $from, $msg) {
+        foreach ($this->clients as $client) {
+            if ($from !== $client) {
+                $client->send($msg);
+            }
+        }
+    }
+    
+    public function onClose(ConnectionInterface $conn) {
+        $this->clients->detach($conn);
+    }
+    
+    public function onError(ConnectionInterface $conn, \Exception $e) {
+        $conn->close();
+    }
 }
