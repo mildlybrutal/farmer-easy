@@ -11,7 +11,7 @@ if ($method === 'POST' && $uri === '/api/users') {
     $password = $data['password'] ?? '';
     $role = $data['role'] ?? '';
 
-    if (empty($name) || empty($email) || empty($password) || !in_array($role, ['farmer', 'retailer', 'public'])) {
+    if (empty($name) || empty($email) || empty($password) || !in_array($role, ['farmer', 'retailer', 'consumer'])) {
         http_response_code(422);
         echo json_encode(['error' => 'Invalid input: name, email, password, and valid role required']);
         exit;

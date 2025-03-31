@@ -46,58 +46,43 @@
     /**
      * Handle user login
      * 
-     * @param array $data Request data containing email and password
+     * @param array $data Request data containing email, password, and role
      * @return void
      */
     function handleLogin($data) {
         global $pdo;
         
-        // Validate input
-        if (!isset($data['email']) || !isset($data['password'])) {
+        if (empty($data['email']) || empty($data['password']) || empty($data['role'])) {
             http_response_code(422);
-            echo json_encode(['error' => 'Email and password are required']);
-            return;
+            echo json_encode(['error' => 'Email, password and role are required']);
+            exit;
         }
         
-        $email = $data['email'];
-        $password = $data['password'];
-        
-        // Query the database
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND role = ?");
+        $stmt->execute([$data['email'], $data['role']]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        // Verify credentials
-        if ($user && password_verify($password, $user['password'])) {
-            // Create session
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['role'] = $user['role'];
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['name'] = $user['name'];
-            $_SESSION['logged_in'] = true;
-            $_SESSION['login_time'] = time();
-            
-            // Update last login timestamp
-            $updateStmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
-            $updateStmt->execute([$user['id']]);
-            
-            // Return success response
-            echo json_encode([
-                'success' => true,
-                'message' => 'Login successful',
-                'user' => [
-                    'id' => $user['id'],
-                    'name' => $user['name'],
-                    'email' => $user['email'],
-                    'role' => $user['role']
-                ],
-                'session_id' => session_id()
-            ]);
-        } else {
-            // Return error for invalid credentials
+        if (!$user || !password_verify($data['password'], $user['password'])) {
             http_response_code(401);
-            echo json_encode(['error' => 'Invalid email or password']);
+            echo json_encode(['error' => 'Invalid credentials']);
+            exit;
         }
+        
+        // Generate session token
+        $sessionId = bin2hex(random_bytes(32));
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['role'] = $user['role'];
+        $_SESSION['logged_in'] = true;
+        
+        echo json_encode([
+            'session_id' => $sessionId,
+            'user' => [
+                'id' => $user['id'],
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'role' => $user['role']
+            ]
+        ]);
     }
 
     /**
@@ -109,62 +94,36 @@
     function handleRegister($data) {
         global $pdo;
         
-        // Validate input
-        if (!isset($data['name']) || !isset($data['email']) || !isset($data['password']) || !isset($data['role'])) {
+        if (empty($data['name']) || empty($data['email']) || empty($data['password']) || empty($data['role'])) {
             http_response_code(422);
             echo json_encode(['error' => 'Name, email, password, and role are required']);
-            return;
+            exit;
         }
         
-        $name = $data['name'];
-        $email = $data['email'];
-        $password = $data['password'];
-        $role = $data['role'];
-        
-        // Validate role
-        if (!in_array($role, ['farmer', 'retailer', 'public'])) {
+        if (!in_array($data['role'], ['farmer', 'retailer', 'consumer'])) {
             http_response_code(422);
-            echo json_encode(['error' => 'Invalid role. Must be farmer, retailer, or public']);
-            return;
+            echo json_encode(['error' => 'Invalid role. Must be farmer, retailer, or consumer']);
+            exit;
         }
         
         // Check if email already exists
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
-        $stmt->execute([$email]);
+        $stmt->execute([$data['email']]);
         if ($stmt->fetchColumn() > 0) {
             http_response_code(409);
             echo json_encode(['error' => 'Email already registered']);
-            return;
+            exit;
         }
         
-        // Hash password
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        
-        // Insert new user
+        // Hash password and insert user
+        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role, created_at) VALUES (?, ?, ?, ?, NOW())");
+        
         try {
-            $stmt->execute([$name, $email, $hashedPassword, $role]);
-            $userId = $pdo->lastInsertId();
-            
-            // Create session for auto-login
-            $_SESSION['user_id'] = $userId;
-            $_SESSION['role'] = $role;
-            $_SESSION['email'] = $email;
-            $_SESSION['name'] = $name;
-            $_SESSION['logged_in'] = true;
-            $_SESSION['login_time'] = time();
-            
-            // Return success response
+            $stmt->execute([$data['name'], $data['email'], $hashedPassword, $data['role']]);
             echo json_encode([
-                'success' => true,
                 'message' => 'Registration successful',
-                'user' => [
-                    'id' => $userId,
-                    'name' => $name,
-                    'email' => $email,
-                    'role' => $role
-                ],
-                'session_id' => session_id()
+                'id' => $pdo->lastInsertId()
             ]);
         } catch (PDOException $e) {
             http_response_code(500);
@@ -178,15 +137,8 @@
      * @return void
      */
     function handleLogout() {
-        // Destroy the session
-        session_unset();
         session_destroy();
-        
-        // Return success response
-        echo json_encode([
-            'success' => true,
-            'message' => 'Logout successful'
-        ]);
+        echo json_encode(['message' => 'Logged out successfully']);
     }
 
     /**

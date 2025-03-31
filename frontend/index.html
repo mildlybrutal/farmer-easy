@@ -58,6 +58,9 @@
                             <button id="registerBtn" class="px-4 py-2 font-medium text-gray-500 hover:text-primary">Register</button>
                         </div>
                         
+                        <div id="errorMessage" class="hidden"></div>
+                        <div id="successMessage" class="hidden"></div>
+                        
                         <form id="loginForm">
                             <div class="mb-4">
                                 <label for="email" class="block text-gray-700 text-sm font-medium mb-2">Email</label>
@@ -71,21 +74,24 @@
                             
                             <div class="mb-4">
                                 <label class="block text-gray-700 text-sm font-medium mb-2">Login as:</label>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <div class="border rounded-md p-3 text-center cursor-pointer hover:border-primary hover:bg-green-50 transition-colors user-type" data-type="farmer">
-                                        <span class="block text-sm font-medium">Farmer</span>
-                                    </div>
-                                    <div class="border rounded-md p-3 text-center cursor-pointer hover:border-primary hover:bg-green-50 transition-colors user-type" data-type="retailer">
-                                        <span class="block text-sm font-medium">Retailer</span>
-                                    </div>
-                                    <div class="border rounded-md p-3 text-center cursor-pointer hover:border-primary hover:bg-green-50 transition-colors user-type" data-type="consumer">
-                                        <span class="block text-sm font-medium">Consumer</span>
-                                    </div>
+                                <div class="space-y-2">
+                                    <label class="flex items-center space-x-3 p-3 border rounded-md hover:border-primary cursor-pointer">
+                                        <input type="radio" name="loginUserType" value="farmer" class="form-radio text-primary focus:ring-primary h-4 w-4">
+                                        <span class="text-sm font-medium text-gray-700">Farmer</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 border rounded-md hover:border-primary cursor-pointer">
+                                        <input type="radio" name="loginUserType" value="retailer" class="form-radio text-primary focus:ring-primary h-4 w-4">
+                                        <span class="text-sm font-medium text-gray-700">Retailer</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 border rounded-md hover:border-primary cursor-pointer">
+                                        <input type="radio" name="loginUserType" value="consumer" class="form-radio text-primary focus:ring-primary h-4 w-4">
+                                        <span class="text-sm font-medium text-gray-700">Consumer</span>
+                                    </label>
                                 </div>
                             </div>
                             
-                            <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-md transition-colors">
-                                Login
+                            <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-md transition-colors flex items-center justify-center" id="loginSubmitBtn">
+                                <span>Sign In</span>
                             </button>
                         </form>
                         
@@ -109,21 +115,24 @@
                             
                             <div class="mb-4">
                                 <label class="block text-gray-700 text-sm font-medium mb-2">Register as:</label>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <div class="border rounded-md p-3 text-center cursor-pointer hover:border-primary hover:bg-green-50 transition-colors user-type" data-type="farmer">
-                                        <span class="block text-sm font-medium">Farmer</span>
-                                    </div>
-                                    <div class="border rounded-md p-3 text-center cursor-pointer hover:border-primary hover:bg-green-50 transition-colors user-type" data-type="retailer">
-                                        <span class="block text-sm font-medium">Retailer</span>
-                                    </div>
-                                    <div class="border rounded-md p-3 text-center cursor-pointer hover:border-primary hover:bg-green-50 transition-colors user-type" data-type="consumer">
-                                        <span class="block text-sm font-medium">Consumer</span>
-                                    </div>
+                                <div class="space-y-2">
+                                    <label class="flex items-center space-x-3 p-3 border rounded-md hover:border-primary cursor-pointer">
+                                        <input type="radio" name="registerUserType" value="farmer" class="form-radio text-primary focus:ring-primary h-4 w-4">
+                                        <span class="text-sm font-medium text-gray-700">Farmer</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 border rounded-md hover:border-primary cursor-pointer">
+                                        <input type="radio" name="registerUserType" value="retailer" class="form-radio text-primary focus:ring-primary h-4 w-4">
+                                        <span class="text-sm font-medium text-gray-700">Retailer</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 border rounded-md hover:border-primary cursor-pointer">
+                                        <input type="radio" name="registerUserType" value="consumer" class="form-radio text-primary focus:ring-primary h-4 w-4">
+                                        <span class="text-sm font-medium text-gray-700">Consumer</span>
+                                    </label>
                                 </div>
                             </div>
                             
-                            <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-md transition-colors">
-                                Register
+                            <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-md transition-colors flex items-center justify-center" id="registerSubmitBtn">
+                                <span>Create Account</span>
                             </button>
                         </form>
                     </div>
@@ -201,49 +210,71 @@
                 loginBtn.classList.add('text-gray-500');
             });
             
-            // Handle user type selection
-            const userTypes = document.querySelectorAll('.user-type');
-            userTypes.forEach(type => {
-                type.addEventListener('click', function() {
-                    const parent = this.parentElement;
-                    parent.querySelectorAll('.user-type').forEach(el => {
-                        el.classList.remove('border-primary', 'bg-green-50');
-                    });
-                    this.classList.add('border-primary', 'bg-green-50');
-                });
-            });
-            
-            // Form submissions
+            // Add loading states to form submissions
             loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                const roleElement = loginForm.querySelector('.user-type.border-primary');
-                const role = roleElement ? roleElement.dataset.type : null;
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
                 
-                if (!role) {
-                    showError('Please select a user type');
-                    return;
+                try {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Signing in...';
+                    
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    const roleElement = loginForm.querySelector('.user-type.border-primary');
+                    const role = roleElement ? roleElement.dataset.type : null;
+                    
+                    if (!role) {
+                        showError('Please select a user type');
+                        return;
+                    }
+                    
+                    await handleLogin(email, password, role);
+                } catch (error) {
+                    showError(error.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
                 }
-                
-                await handleLogin(email, password, role);
             });
             
             registerForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const userData = {
-                    name: document.getElementById('fullName').value,
-                    email: document.getElementById('registerEmail').value,
-                    password: document.getElementById('registerPassword').value,
-                    role: registerForm.querySelector('.user-type.border-primary')?.dataset.type
-                };
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
                 
-                if (!userData.role) {
-                    showError('Please select a user type');
-                    return;
+                try {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Creating account...';
+                    
+                    const password = document.getElementById('registerPassword').value;
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+                    
+                    if (password !== confirmPassword) {
+                        showError('Passwords do not match');
+                        return;
+                    }
+                    
+                    const userData = {
+                        name: document.getElementById('fullName').value,
+                        email: document.getElementById('registerEmail').value,
+                        password: document.getElementById('registerPassword').value,
+                        role: registerForm.querySelector('.user-type.border-primary')?.dataset.type
+                    };
+                    
+                    if (!userData.role) {
+                        showError('Please select a user type');
+                        return;
+                    }
+                    
+                    await handleRegister(userData);
+                } catch (error) {
+                    showError(error.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
                 }
-                
-                await handleRegister(userData);
             });
         });
     </script>
