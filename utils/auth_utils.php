@@ -144,3 +144,30 @@ function checkFailedAttempts($pdo, $email, $maxAttempts = 5, $timeWindow = 900) 
     
     return $stmt->fetchColumn() >= $maxAttempts;
 }
+
+/**
+ * Check if user is authenticated
+ * 
+ * @return bool True if authenticated, false otherwise
+ */
+function isAuthenticated() {
+    return isset($_SESSION['user_id']) && isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
+}
+
+/**
+ * Check if user has specific role
+ * 
+ * @param string|array $roles Role or array of roles to check
+ * @return bool True if user has the role, false otherwise
+ */
+function hasRole($roles) {
+    if (!isAuthenticated()) {
+        return false;
+    }
+    
+    if (is_array($roles)) {
+        return in_array($_SESSION['role'], $roles);
+    }
+    
+    return $_SESSION['role'] === $roles;
+}

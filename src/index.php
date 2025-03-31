@@ -22,6 +22,21 @@ if (strpos($uri, '/api/auth') === 0) {
     exit;
 }
 
+// Handle bidding system routes
+if (strpos($uri, '/api/bidding/projects') === 0) {
+    require __DIR__ . '/api/bidding/projects.php';
+    exit;
+} elseif (strpos($uri, '/api/bidding/bids') === 0) {
+    require __DIR__ . '/api/bidding/bids.php';
+    exit;
+} elseif (strpos($uri, '/api/bidding/messages') === 0) {
+    require __DIR__ . '/api/bidding/messages.php';
+    exit;
+} elseif (strpos($uri, '/api/bidding/contracts') === 0) {
+    require __DIR__ . '/api/bidding/contracts.php';
+    exit;
+}
+
 // Legacy routes - will be migrated to new structure
 if ($uri === '/api/login' && $method === 'POST') {
     require __DIR__ . '/controllers/auth.php';
