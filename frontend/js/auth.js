@@ -1,6 +1,5 @@
 // Add this file to handle authentication
-const API_URL = 'http://localhost:8000';
-
+const API_URL = 'http://localhost/farmconnect-backend/api';
 // Add form validation functions
 function validateEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -12,49 +11,18 @@ function validatePassword(password) {
 }
 
 async function handleLogin(email, password, role) {
-    if (!validateEmail(email)) {
-        throw new Error('Please enter a valid email address');
-    }
-
-    if (!validatePassword(password)) {
-        throw new Error('Password must be at least 6 characters long');
-    }
-
     try {
-        const response = await fetch(`${API_URL}/api/auth/login`, {
+        const response = await fetch(`${API_URL}/auth.php?action=login`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password, role })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
         });
-        
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
-        
-        localStorage.setItem('token', data.session_id);
         localStorage.setItem('user', JSON.stringify(data.user));
-        
-        showSuccess('Login successful! Redirecting...');
-        
-        // Redirect after a short delay to show the success message
-        setTimeout(() => {
-            switch(data.user.role) {
-                case 'farmer':
-                    window.location.href = '/farmer/dashboard.html';
-                    break;
-                case 'retailer':
-                    window.location.href = '/retailer/dashboard.html';
-                    break;
-                case 'consumer':
-                    window.location.href = '/products.html';
-                    break;
-                default:
-                    throw new Error('Invalid user role');
-            }
-        }, 1500);
+        alert("Login successful!");
     } catch (error) {
-        throw error;
+        alert(error.message);
     }
 }
 
