@@ -1,6 +1,7 @@
 <?php
     session_start();
     require_once __DIR__ . '/../../../config/db_connect.php';
+    require_once __DIR__ . '/../../../config/auth_config.php';
 
     // Get the request method and data
     $method = $_SERVER['REQUEST_METHOD'];
@@ -58,7 +59,15 @@
             exit;
         }
         
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND role = ?");
+        // Validate role
+        $config = require __DIR__ . '/../../../config/auth_config.php';
+        if (!in_array($data['role'], $config['allowed_roles'])) {
+            http_response_code(422);
+            echo json_encode(['error' => 'Invalid role']);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND role = ? AND active = 1");
         $stmt->execute([$data['email'], $data['role']]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -67,21 +76,24 @@
             echo json_encode(['error' => 'Invalid credentials']);
             exit;
         }
+
+        // Generate CSRF token
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        $_SESSION['csrf_token_expiry'] = time() + $config['csrf_token_expiry'];
         
-        // Generate session token
-        $sessionId = bin2hex(random_bytes(32));
+        // Set session data
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = $user['role'];
-        $_SESSION['logged_in'] = true;
-        
+        $_SESSION['login_time'] = time();
+
         echo json_encode([
-            'session_id' => $sessionId,
             'user' => [
                 'id' => $user['id'],
                 'name' => $user['name'],
                 'email' => $user['email'],
                 'role' => $user['role']
-            ]
+            ],
+            'csrf_token' => $_SESSION['csrf_token']
         ]);
     }
 

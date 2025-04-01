@@ -66,6 +66,7 @@ function requireAuth() {
         exit;
     }
     
+    validateCsrfToken();
     return true;
 }
 
@@ -131,4 +132,29 @@ function checkSessionTimeout($timeout = 3600) {
         // Update last activity time
         $_SESSION['login_time'] = $currentTime;
     }
+}
+
+/**
+ * Validate CSRF token
+ * 
+ * @return bool True if valid, exits with 403 response otherwise
+ */
+function validateCsrfToken() {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        return true;
+    }
+    
+    $headers = getallheaders();
+    $token = $headers['X-CSRF-Token'] ?? null;
+    
+    if (!$token || !isset($_SESSION['csrf_token']) || 
+        !isset($_SESSION['csrf_token_expiry']) || 
+        $token !== $_SESSION['csrf_token'] || 
+        time() > $_SESSION['csrf_token_expiry']) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Invalid CSRF token']);
+        exit;
+    }
+    
+    return true;
 }
