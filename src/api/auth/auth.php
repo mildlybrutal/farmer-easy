@@ -106,6 +106,13 @@
             exit;
         }
         
+        // Validate email format
+        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            http_response_code(422);
+            echo json_encode(['error' => 'Invalid email format']);
+            exit;
+        }
+        
         // Check if email already exists
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
         $stmt->execute([$data['email']]);
@@ -121,9 +128,22 @@
         
         try {
             $stmt->execute([$data['name'], $data['email'], $hashedPassword, $data['role']]);
+            $userId = $pdo->lastInsertId();
+            
+            // Create a session for the newly registered user
+            session_start();
+            $_SESSION['user_id'] = $userId;
+            $_SESSION['role'] = $data['role'];
+            
             echo json_encode([
+                'success' => true,
                 'message' => 'Registration successful',
-                'id' => $pdo->lastInsertId()
+                'user' => [
+                    'id' => $userId,
+                    'name' => $data['name'],
+                    'email' => $data['email'],
+                    'role' => $data['role']
+                ]
             ]);
         } catch (PDOException $e) {
             http_response_code(500);

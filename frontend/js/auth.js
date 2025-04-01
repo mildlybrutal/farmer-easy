@@ -58,23 +58,68 @@ async function handleLogin(email, password, role) {
     }
 }
 
-async function handleRegister(userData) {
+async function handleRegister(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const role = document.querySelector('input[name="registerUserType"]:checked')?.value;
+    
     try {
+        // Validate inputs
+        if (!name || !email || !password || !role) {
+            throw new Error('All fields are required');
+        }
+        
+        if (!validateEmail(email)) {
+            throw new Error('Please enter a valid email address');
+        }
+        
+        if (!validatePassword(password)) {
+            throw new Error('Password must be at least 6 characters long');
+        }
+        
         const response = await fetch(`${API_URL}/api/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(userData)
+            body: JSON.stringify({ name, email, password, role })
         });
         
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
         
-        showSuccess('Registration successful! Please login.');
-        showLoginForm();
+        if (!response.ok) {
+            throw new Error(data.error || 'Registration failed');
+        }
+        
+        // Store user data in localStorage
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        showSuccess('Registration successful! Redirecting...');
+        
+        // Redirect based on role
+        setTimeout(() => {
+            switch(role) {
+                case 'farmer':
+                    window.location.href = '/farmer/dashboard.html';
+                    break;
+                case 'retailer':
+                    window.location.href = '/retailer/dashboard.html';
+                    break;
+                case 'consumer':
+                    window.location.href = '/products.html';
+                    break;
+                default:
+                    throw new Error('Invalid user role');
+            }
+        }, 1500);
+        
     } catch (error) {
         showError(error.message);
+        // Reset form
+        document.getElementById('registerForm').reset();
     }
 }
 
@@ -95,24 +140,18 @@ function showError(message) {
     const errorDiv = document.getElementById('errorMessage');
     errorDiv.textContent = message;
     errorDiv.classList.remove('hidden');
-    errorDiv.classList.add('bg-red-100', 'border', 'border-red-400', 'text-red-700', 'px-4', 'py-3', 'rounded', 'mb-4');
-    
-    // Auto-hide after 5 seconds
     setTimeout(() => {
         errorDiv.classList.add('hidden');
-    }, 5000);
+    }, 3000);
 }
 
 function showSuccess(message) {
     const successDiv = document.getElementById('successMessage');
     successDiv.textContent = message;
     successDiv.classList.remove('hidden');
-    successDiv.classList.add('bg-green-100', 'border', 'border-green-400', 'text-green-700', 'px-4', 'py-3', 'rounded', 'mb-4');
-    
-    // Auto-hide after 5 seconds
     setTimeout(() => {
         successDiv.classList.add('hidden');
-    }, 5000);
+    }, 3000);
 }
 
 // Update the form submission handlers in the DOMContentLoaded event listener
@@ -147,46 +186,7 @@ loginForm.addEventListener('submit', async function(e) {
 });
 
 // Replace the register form submission handler:
-registerForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    
-    try {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Creating account...';
-        
-        const password = document.getElementById('registerPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        
-        if (password !== confirmPassword) {
-            showError('Passwords do not match');
-            return;
-        }
-        
-        const roleElement = document.querySelector('input[name="registerUserType"]:checked');
-        const role = roleElement ? roleElement.value : null;
-        
-        if (!role) {
-            showError('Please select a user type');
-            return;
-        }
-        
-        const userData = {
-            name: document.getElementById('fullName').value,
-            email: document.getElementById('registerEmail').value,
-            password: document.getElementById('registerPassword').value,
-            role: role
-        };
-        
-        await handleRegister(userData);
-    } catch (error) {
-        showError(error.message);
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-    }
-});
+document.getElementById('registerForm').addEventListener('submit', handleRegister);
 
 // Add radio button styling on selection
 document.querySelectorAll('input[type="radio"]').forEach(radio => {
